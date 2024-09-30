@@ -21,46 +21,79 @@ public class ContamasterDemo {
     
     public static void main(String[] args) {
         // TODO code application logic here
-        
+        /***
+         * LAS DOS SIGUIENTES LINEAS DE COIDIGO COMENTADAS SE DEBEN EJECUTAR UNICAMENTE UNA VEZ, LA PRIMERA VEZ QUE SE EJECUTA EL PROGRAMA
+         * @return Administrador
+         */
         // UsuarioControlador.Instancia().CrearAdministradorInicial();
         // System.out.println("[EL USUARIO ADMINISTRADOR SE HA CREADO EXITOSAMENETE]");
-        MostrarLogin();
-        boolean opcionValida = true;
-        int opcion = 0;
+        
+        int idUsuarioLogueado = MostrarLogin();
+        boolean opcionValida = true; // Valida la opción del menu principal
+        int opcion; // Almacena la opción
         do {
+            opcion = 0;
             MostrarMenu();
-            if (!entrada.hasNextInt()) {
-                String texto = entrada.next();
-                System.out.println(" |--------------------------------------------------------------------------------------------------| ");
-                System.out.println(" |                                        [OPCION NO VALIDA]                                        | ");
-                System.out.println(" |--------------------------------------------------------------------------------------------------| ");
+            if (!entrada.hasNextInt()) { // Valida que el dato ingresado sea un numero
+                MostrarOpcionNoValida(); // Indica el mensaje de error
             } else {
-                opcion = entrada.nextInt();
+                opcion = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
+                // Se ejecuta la opción seleccionada
                 switch (opcion) {
-                    case 1:
+                    case 1: // Caso de gestión de ususarios
+                        boolean opValidaUsusarios = true;
+                        int opGestionUsuarios;
+                        do {
+                            opGestionUsuarios = 0;
+                            MostrarMenuUsuarios();
+                            // Valida que la entrada sea limpia (un entero)
+                            if (!entrada.hasNextInt()) {
+                                MostrarOpcionNoValida(); // Indica el mensaje de error
+                            } else {
+                                opGestionUsuarios = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
+                                
+                                switch (opGestionUsuarios) {
+                                    case 1: // Caso de agregar ususario 
+                                        System.out.println("Ingrese el nombre del nuevo usuario: ");
+                                        
+                                        break;
+                                    case 2: // Caso de actualizar datos de un usuario
+                                        break;
+                                    case 3: // Eliminar un usuario
+                                        break;
+                                    case 4: // Ver lista de usuarios
+                                        break;
+                                    case 5: // Regresar al menu principal
+                                        opValidaUsusarios = false;
+                                        break;
+                                    default: // Caso no permitido
+                                        break;
+                                }
+                            }
+                        } while (opValidaUsusarios);
                         MostrarMenuUsuarios();
                         break;
-                    case 2:
+                    case 2: // Caso de gestión de empresas
                         break;
-                    case 3:
+                    case 3: // Caso de gestión de cuentas
                         break;
-                    case 4:
+                    case 4: // Caso de administración contable
                         break;
-                    case 5:
+                    case 5: // Cerrar sesión
                         System.out.println("GRACIAS POR PREFERIRNOS, HASTA LUEGO :)");
                         opcionValida = false;
                         break;
-                    default:
+                    default: // Opción no válida
                         System.out.println("[PARECE QUE OCURRIO UN ERROR, ESTAMOS TRABAJANDO EN ELLO]");
-                        opcion = 0;
                         break;
                 }
             }
         } while (opcionValida);//opcion == 0 || opcion > 5
     }
     
-    private static void MostrarLogin() {
+    private static int MostrarLogin() {
         boolean sesionIniciada = false;
+        int resultado = 0;
         while (!sesionIniciada) {
             Usuario usuarioLogin = new Usuario();
             System.out.println("|----------------------> LOGIN <----------------------|");
@@ -69,7 +102,7 @@ public class ContamasterDemo {
             System.out.println("| INGRESE SU CONTRASEÑA: ");
             usuarioLogin.setPassword(entrada.nextLine());
 
-            int resultado = UsuarioControlador.Instancia().ValidarLogin(usuarioLogin);
+            resultado = UsuarioControlador.Instancia().ValidarLogin(usuarioLogin);
 
             if (resultado == -1) { // Caso que el usuario no exita
                 System.out.println("EL USUARIO NO ESTA REGISTRADO EN LA DB");
@@ -79,6 +112,7 @@ public class ContamasterDemo {
                 sesionIniciada = true;
             }
         }
+        return resultado;
     }
     
     private static void MostrarMenu() {
@@ -94,9 +128,9 @@ public class ContamasterDemo {
         System.out.println("* |---------------------------------| *");
         System.out.println("* | 2 => ADMINISTRAR EMPRESAS       | *");
         System.out.println("* |---------------------------------| *");
-        System.out.println("* | 3 => ADMINI9STRAR CUENTAS       | *");
+        System.out.println("* | 3 => ADMINISTRAR CUENTAS        | *");
         System.out.println("* |---------------------------------| *");
-        System.out.println("* | 4 => ADMINISTRAXION CONTABLE    | *");
+        System.out.println("* | 4 => ADMINISTRACION CONTABLE    | *");
         System.out.println("* |---------------------------------| *");
         System.out.println("* | 5 => CERRAR SESION              | *");
         System.out.println("* |---------------------------------| *");
@@ -123,6 +157,35 @@ public class ContamasterDemo {
         System.out.println("* | 5 => REGRESAR AL MENU PRINCIPAL | *");
         System.out.println("* |---------------------------------| *");
         System.out.println("***************************************");  
+    }
+    
+    private static void MostrarMenuTipoUsuario() {
+         System.out.println("***************************************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |  SELECCIONE EL TIPO DE USUARIO  | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |     [SELECCIONA UNA OPCION]     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 1 => ADMINISTRADOR              | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 2 => GERENTE                    | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 3 => CONTADOR                   | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 4 => AUXILIAR DE CONTADOR       | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 5 => REGRESAR AL MENU ANTERIOR  | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************"); 
+    }
+    
+    private static void MostrarOpcionNoValida() {
+        String texto = entrada.next();
+        System.out.println(" |--------------------------------------------------------------------------------------------------| ");
+        System.out.println(" |                                        [OPCION NO VALIDA]                                        | ");
+        System.out.println(" |--------------------------------------------------------------------------------------------------| ");
     }
     
 }
