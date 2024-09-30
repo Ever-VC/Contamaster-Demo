@@ -63,19 +63,11 @@ public class UsuarioControlador {
         admin.setPassword(hashPassword("admin"));
         
         //Crea un objeto del rol de tipo Administrador
-        Rol rolAdministrador = RolControlador.Instancia().getRolPorId(1);
+        Rol rolAdministrador = RolControlador.Instancia().GetRolPorId(1);
         
         admin.setIdRolFk(rolAdministrador);//Indica el rol
         
         CrearUsuario(admin);//Crea el usuario
-    }
-    
-    public void CrearUsuario(Usuario nuevo_usuario) {
-        _entityManager = setEntityManager();
-        _entityManager.getTransaction().begin();
-        _entityManager.persist(nuevo_usuario);
-        _entityManager.getTransaction().commit();
-        _entityManager.close();
     }
     
     public int ValidarLogin(Usuario usuarioLogin) {
@@ -110,5 +102,21 @@ public class UsuarioControlador {
             _entityManager.close();
             return -1; // Nombre de usuario no existe
         }
+    }
+    
+    public void GetUsuarioPorId(Integer id) {
+        _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
+        Usuario usuarioBuscado = _entityManager.find(Usuario.class, id);
+        _entityManager.close();
+        return usuarioBuscado;
+    }
+    
+    public void CrearUsuario(Usuario nuevo_usuario) {
+        _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
+        _entityManager.persist(nuevo_usuario);
+        _entityManager.getTransaction().commit();
+        _entityManager.close();
     }
 }
