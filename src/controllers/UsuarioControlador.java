@@ -104,7 +104,7 @@ public class UsuarioControlador {
         }
     }
     
-    public void GetUsuarioPorId(Integer id) {
+    public Usuario GetUsuarioPorId(Integer id) {
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
         Usuario usuarioBuscado = _entityManager.find(Usuario.class, id);
