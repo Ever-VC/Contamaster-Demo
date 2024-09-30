@@ -6,6 +6,7 @@ package controllers;
 
 import connection.Conexion;
 import java.security.MessageDigest;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import models.Rol;
@@ -112,11 +113,32 @@ public class UsuarioControlador {
         return usuarioBuscado;
     }
     
+    public List<Usuario> GetListaUsuarios() {
+        _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
+        return _entityManager.createQuery("SELECT usrs FROM Usuario usrs").getResultList();
+    }
+    
     public void CrearUsuario(Usuario nuevoUsuario) {
         nuevoUsuario.setPassword(hashPassword(nuevoUsuario.getPassword()));
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
         _entityManager.persist(nuevoUsuario);
+        _entityManager.getTransaction().commit();
+        _entityManager.close();
+    }
+    
+    public void ActualizarUsuario(Usuario usuarioActualizado) {
+        _entityManager = setEntityManager();
+        Usuario usuario = _entityManager.find(Usuario.class, usuarioActualizado.getId());
+        usuario.setNombres(usuarioActualizado.getNombres());
+        usuario.setApellidos(usuarioActualizado.getApellidos());
+        usuario.setSexo(usuarioActualizado.getSexo());
+        usuario.setFechaNacimiento(usuarioActualizado.getFechaNacimiento());
+        usuario.setDireccion(usuarioActualizado.getDireccion());
+        usuario.setEmail(usuarioActualizado.getEmail());
+        usuario.setUsername(usuarioActualizado.getUsername());
+        usuario.setPassword(usuarioActualizado.getPassword());
         _entityManager.getTransaction().commit();
         _entityManager.close();
     }
