@@ -139,7 +139,7 @@ public class UsuarioControlador {
         usuario.setDireccion(usuarioActualizado.getDireccion());
         usuario.setEmail(usuarioActualizado.getEmail());
         usuario.setUsername(usuarioActualizado.getUsername());
-        usuario.setPassword(usuarioActualizado.getPassword());
+        usuario.setPassword(hashPassword(usuarioActualizado.getPassword()));
         _entityManager.getTransaction().commit();
         _entityManager.close();
     }
