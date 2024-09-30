@@ -9,6 +9,7 @@ import controllers.UsuarioControlador;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import models.FabUsuario;
 import models.Rol;
@@ -61,7 +62,8 @@ public class ContamasterDemo {
                                 MostrarOpcionNoValida(); // Indica el mensaje de error
                             } else {
                                 opGestionUsuarios = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
-                                
+                                List<Usuario> lstUsuarios = UsuarioControlador.Instancia().GetListaUsuarios();
+                                int idUsuario; // Almacena el id del usuario que se desee eliminar o actualizar
                                 switch (opGestionUsuarios) {
                                     case 1: // Caso de agregar ususario 
                                         boolean opTipoUsuario = true; // Permite verificar si el tipo de usuario está dentro de los permitido
@@ -79,15 +81,6 @@ public class ContamasterDemo {
                                                     opTipoUsuario = false; // Indica que desea salir al menu anterior
                                                 } else {
                                                     nuevoUsuario = NuevoUsuario(opcionTipoUsuario);
-                                                    System.out.println("Tipo de usuario: " + nuevoUsuario.getIdRolFk().getNombre());
-                                                    System.out.println("Nombres: " + nuevoUsuario.getNombres());
-                                                    System.out.println("Apellidos: " + nuevoUsuario.getApellidos());
-                                                    System.out.println("Sexo: " + nuevoUsuario.getSexo());
-                                                    System.out.println("fecha nacimiento: " + nuevoUsuario.getFechaNacimiento());
-                                                    System.out.println("Direccion: " + nuevoUsuario.getDireccion());
-                                                    System.out.println("Email: " + nuevoUsuario.getEmail());
-                                                    System.out.println("Usuario: " + nuevoUsuario.getUsername());
-                                                    System.out.println("Password: " + nuevoUsuario.getPassword());
                                                     UsuarioControlador.Instancia().CrearUsuario(nuevoUsuario);
                                                     System.out.println("USUARIO CREADO EXITOSAMENTE, DESEA AGREGAR OTRO USUARIO? [Si/No]");
                                                     String op = entrada.nextLine();
@@ -100,11 +93,38 @@ public class ContamasterDemo {
                                         
                                         break;
                                     case 2: // Caso de actualizar datos de un usuario
+                                        System.out.println("LISTA DE USUARIOS: ");
+                                        for (Usuario _usuario : lstUsuarios) {
+                                            MostrarInfoDeUsuario(_usuario);
+                                        }
+                                        /**
+                                         * FALTA VALIDAR EL TIPO DE DATO Y QUE EL ID EXISTA
+                                        */
+                                        System.out.println("INGRESE EL [ID] DEL USUARIO QUE DESEA MODIFICAR");
+                                        idUsuario = entrada.nextInt();
+                                        Usuario usuarioEditado = UsuarioControlador.Instancia().GetUsuarioPorId(idUsuario);
+                                        usuarioEditado = PedirInformacionDeUsuario(usuarioEditado);
+                                        UsuarioControlador.Instancia().ActualizarUsuario(usuarioEditado);
+                                        System.out.println("USUARIO ACTUALIZADO EXITOSAMENTE");
                                         break;
                                     case 3: // Eliminar un usuario
+                                        System.out.println("LISTA DE USUARIOS: ");
+                                        for (Usuario _usuario : lstUsuarios) {
+                                            MostrarInfoDeUsuario(_usuario);
+                                        }
+                                        /**
+                                         * FALTA VALIDAR EL TIPO DE DATO Y QUE EL ID EXISTA
+                                        */
+                                        System.out.println("INGRESE EL [ID] DEL USUARIO QUE DESEA ELIMINAR");
+                                        idUsuario = entrada.nextInt();
+                                        UsuarioControlador.Instancia().EliminarUsuario(idUsuario);
+                                        System.out.println("USUARIO ELIMINADO EXITOSAMENTE");
                                         break;
                                     case 4: // Ver lista de usuarios
-                                        
+                                        System.out.println("LISTA DE USUARIOS: ");
+                                        for (Usuario _usuario : lstUsuarios) {
+                                            MostrarInfoDeUsuario(_usuario);
+                                        }
                                         break;
                                     case 5: // Regresar al menu principal
                                         opValidaUsusarios = false;
@@ -307,5 +327,19 @@ public class ContamasterDemo {
         System.out.println("Ingrese la contraseña para el nuevo usuario: ");
         _nuevoUsuario.setPassword(entrada.nextLine());
         return _nuevoUsuario;
+    }
+    
+    private static void MostrarInfoDeUsuario(Usuario usuario) {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Id de usuario: " + usuario.getId());
+        System.out.println("Tipo de usuario: " + usuario.getIdRolFk().getNombre());
+        System.out.println("Nombres: " + usuario.getNombres());
+        System.out.println("Apellidos: " + usuario.getApellidos());
+        System.out.println("Sexo: " + usuario.getSexo());
+        System.out.println("Fecha nacimiento: " + (usuario.getFechaNacimiento() != null ? usuario.getFechaNacimiento() : "No definido"));
+        System.out.println("Direccion: " + (usuario.getDireccion() != null ? usuario.getDireccion() : "No definido"));
+        System.out.println("Email: " + (usuario.getEmail() != null ? usuario.getEmail() : "No definido"));
+        System.out.println("Usuario: " + usuario.getUsername());
+        System.out.println("--------------------------------------------------------");
     }
 }
