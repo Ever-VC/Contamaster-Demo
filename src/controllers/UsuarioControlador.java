@@ -60,7 +60,7 @@ public class UsuarioControlador {
         admin.setSexo("Masculino");
         admin.setEmail("ever.oficial@gmail.com");
         admin.setUsername("admin");
-        admin.setPassword(hashPassword("admin"));
+        admin.setPassword("admin");
         
         //Crea un objeto del rol de tipo Administrador
         Rol rolAdministrador = RolControlador.Instancia().GetRolPorId(1);
@@ -112,10 +112,11 @@ public class UsuarioControlador {
         return usuarioBuscado;
     }
     
-    public void CrearUsuario(Usuario nuevo_usuario) {
+    public void CrearUsuario(Usuario nuevoUsuario) {
+        nuevoUsuario.setPassword(hashPassword(nuevoUsuario.getPassword()));
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
-        _entityManager.persist(nuevo_usuario);
+        _entityManager.persist(nuevoUsuario);
         _entityManager.getTransaction().commit();
         _entityManager.close();
     }
