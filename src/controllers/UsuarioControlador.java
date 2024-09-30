@@ -130,6 +130,7 @@ public class UsuarioControlador {
     
     public void ActualizarUsuario(Usuario usuarioActualizado) {
         _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
         Usuario usuario = _entityManager.find(Usuario.class, usuarioActualizado.getId());
         usuario.setNombres(usuarioActualizado.getNombres());
         usuario.setApellidos(usuarioActualizado.getApellidos());
@@ -139,6 +140,15 @@ public class UsuarioControlador {
         usuario.setEmail(usuarioActualizado.getEmail());
         usuario.setUsername(usuarioActualizado.getUsername());
         usuario.setPassword(usuarioActualizado.getPassword());
+        _entityManager.getTransaction().commit();
+        _entityManager.close();
+    }
+    
+    public void EliminarUsuario(Integer idUsuarioEliminar) {
+        _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
+        Usuario usuarioEliminar = _entityManager.find(Usuario.class, idUsuarioEliminar);
+        _entityManager.remove(_entityManager.merge(usuarioEliminar));
         _entityManager.getTransaction().commit();
         _entityManager.close();
     }
