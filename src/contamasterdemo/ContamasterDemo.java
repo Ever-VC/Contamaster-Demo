@@ -4,6 +4,7 @@
  */
 package contamasterdemo;
 
+import controllers.EmpresaControlador;
 import controllers.RolControlador;
 import controllers.UsuarioControlador;
 import java.text.ParseException;
@@ -11,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import models.Empresa;
 import models.FabUsuario;
 import models.Rol;
 import models.Usuario;
@@ -26,6 +28,7 @@ public class ContamasterDemo {
      */
     private static Scanner entrada = new Scanner(System.in);
     private static Usuario nuevoUsuario;
+    private static Empresa nuevaEmpresa;
     
     public static void main(String[] args) throws ParseException {
         // TODO code application logic here
@@ -135,9 +138,69 @@ public class ContamasterDemo {
                                 }
                             }
                         } while (opValidaUsusarios);
-                        MostrarMenuUsuarios();
                         break;
                     case 2: // Caso de gestión de empresas
+                        boolean opValidaEmpresas = true;
+                        int opGestionEmpresas;
+                        do {
+                            opGestionEmpresas = 0;
+                            MostrarMenuEmpresas();
+                            // Valida que la entrada sea limpia (un entero)
+                            if (!entrada.hasNextInt()) {
+                                MostrarOpcionNoValida(); // Indica el mensaje de error
+                            } else {
+                                opGestionEmpresas = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
+                                List<Empresa> lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
+                                int idEmpresa; // Almacena el id de la empresa que se desee eliminar o actualizar
+                                switch (opGestionEmpresas) {
+                                    case 1: // Caso de agregar Empresa 
+                                        nuevaEmpresa = NuevaEmpresa();
+                                        EmpresaControlador.Instancia().CrearEmpresa(nuevaEmpresa);
+                                        System.out.println("EMPRESA CREADA EXITOSAMENTE");
+                                        break;
+                                    case 2: // Caso de actualizar datos de un usuario
+                                        System.out.println("LISTA DE EMPRESAS: ");
+                                        for (Empresa _empresa : lstEmpresas) {
+                                            MostrarInfoEmpresa(_empresa);
+                                        }
+                                        /**
+                                         * FALTA VALIDAR EL TIPO DE DATO Y QUE EL ID EXISTA
+                                        */
+                                        System.out.println("INGRESE EL [ID] DE LA EMPRESA QUE DESEA MODIFICAR");
+                                        idEmpresa = entrada.nextInt();
+                                        Empresa empresaEditada = EmpresaControlador.Instancia().GetEmpresaPorId(idEmpresa);
+                                        empresaEditada = PedirInformacionDeEmpresa(empresaEditada);
+                                        EmpresaControlador.Instancia().ActualizarEmpresa(empresaEditada);
+                                        System.out.println("EMPRESA ACTUALIZADA EXITOSAMENTE");
+                                        break;
+                                    case 3: // Eliminar un Empresa
+                                        System.out.println("LISTA DE USUARIOS: ");
+                                        for (Empresa _empresa : lstEmpresas) {
+                                            MostrarInfoEmpresa(_empresa);
+                                        }
+                                        /**
+                                         * FALTA VALIDAR EL TIPO DE DATO Y QUE EL ID EXISTA
+                                        */
+                                        System.out.println("INGRESE EL [ID] DE LA EMPRESA QUE DESEA ELIMINAR");
+                                        idEmpresa = entrada.nextInt();
+                                        EmpresaControlador.Instancia().EliminarEmpresa(idEmpresa);
+                                        System.out.println("EMPRESA ELIMINADA EXITOSAMENTE");
+                                        break;
+                                    case 4: // Ver lista de empresas
+                                        System.out.println("LISTA DE EMPRESAS: ");
+                                        for (Empresa _empresa : lstEmpresas) {
+                                            MostrarInfoEmpresa(_empresa);
+                                        }
+                                        break;
+                                    case 5: // Regresar al menu principal
+                                        opValidaEmpresas = false;
+                                        break;
+                                    default: // Caso no permitido
+                                        MostrarOpcionNoValida();
+                                        break;
+                                }
+                            }
+                        } while (opValidaEmpresas);
                         break;
                     case 3: // Caso de gestión de cuentas
                         break;
@@ -340,6 +403,53 @@ public class ContamasterDemo {
         System.out.println("Direccion: " + (usuario.getDireccion() != null ? usuario.getDireccion() : "No definido"));
         System.out.println("Email: " + (usuario.getEmail() != null ? usuario.getEmail() : "No definido"));
         System.out.println("Usuario: " + usuario.getUsername());
+        System.out.println("--------------------------------------------------------");
+    }
+    
+    private static void MostrarMenuEmpresas() {
+        System.out.println("************************** *************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |   MENU DE GESTION DE EMPRESAS   | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |     [SELECCIONA UNA OPCION]     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 1 => AGREGAR NUEVA EMPRESA      | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 2 => ACTUALIZAR UNA EMPRESA     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 3 => ELIMINAR UNA EMPRESA       | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 4 => VER TODOS LAS EMPRESAS     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 5 => REGRESAR AL MENU PRINCIPAL | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");  
+    }
+
+    private static Empresa NuevaEmpresa() {
+        return PedirInformacionDeEmpresa(new Empresa());
+    }
+    
+    private static Empresa PedirInformacionDeEmpresa(Empresa _nuevaEmpresa) {
+        System.out.println("[TODOS LOS CAMPOS QUE TENGAN UN '*' SON OBLIGATORIOS]");
+        entrada.nextLine();
+        System.out.println("Ingrese el nombre de la empresa:  [*] ");
+        _nuevaEmpresa.setNombre(entrada.nextLine());
+        System.out.println("Ingrese la direccion de la empresa:  [*] ");
+        _nuevaEmpresa.setDireccion(entrada.nextLine());
+        System.out.println("Ingrese el email de la empresa:  [*] ");
+        _nuevaEmpresa.setEmail(entrada.next());
+        return _nuevaEmpresa;
+    }
+    
+    private static void MostrarInfoEmpresa(Empresa empresa) {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Id Empresa: " + empresa.getId());
+        System.out.println("Nombre de la empresa: " + empresa.getNombre());
+        System.out.println("Direccion: " + empresa.getDireccion());
+        System.out.println("Email: " + empresa.getEmail());
         System.out.println("--------------------------------------------------------");
     }
 }
