@@ -4,6 +4,7 @@
  */
 package contamasterdemo;
 
+import controllers.CuentaControlador;
 import controllers.EmpresaControlador;
 import controllers.RolControlador;
 import controllers.UsuarioControlador;
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import models.Cuenta;
 import models.Empresa;
 import models.FabUsuario;
 import models.Rol;
@@ -29,6 +31,7 @@ public class ContamasterDemo {
     private static Scanner entrada = new Scanner(System.in);
     private static Usuario nuevoUsuario;
     private static Empresa nuevaEmpresa;
+    private static Cuenta nuevaCuenta;
     
     public static void main(String[] args) throws ParseException {
         // TODO code application logic here
@@ -158,7 +161,7 @@ public class ContamasterDemo {
                                         EmpresaControlador.Instancia().CrearEmpresa(nuevaEmpresa);
                                         System.out.println("EMPRESA CREADA EXITOSAMENTE");
                                         break;
-                                    case 2: // Caso de actualizar datos de un usuario
+                                    case 2: // Caso de actualizar datos de una empresa
                                         System.out.println("LISTA DE EMPRESAS: ");
                                         for (Empresa _empresa : lstEmpresas) {
                                             MostrarInfoEmpresa(_empresa);
@@ -173,8 +176,8 @@ public class ContamasterDemo {
                                         EmpresaControlador.Instancia().ActualizarEmpresa(empresaEditada);
                                         System.out.println("EMPRESA ACTUALIZADA EXITOSAMENTE");
                                         break;
-                                    case 3: // Eliminar un Empresa
-                                        System.out.println("LISTA DE USUARIOS: ");
+                                    case 3: // Eliminar una empresa
+                                        System.out.println("LISTA DE EMPRESAS: ");
                                         for (Empresa _empresa : lstEmpresas) {
                                             MostrarInfoEmpresa(_empresa);
                                         }
@@ -203,6 +206,74 @@ public class ContamasterDemo {
                         } while (opValidaEmpresas);
                         break;
                     case 3: // Caso de gestión de cuentas
+                        List<Empresa> lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
+                        if (lstEmpresas.size() < 1) {
+                            System.out.println("NO HAY NINGUNA EMPRESA REGISTRADA EN LA BASE DE DATOS");
+                            break;
+                        }
+                        int idEmpresa;
+                        System.out.println("LISTA DE EMPRESAS: ");
+                        for (Empresa _empresa : lstEmpresas) {
+                            MostrarInfoEmpresa(_empresa);
+                        }
+                        System.out.println("SELECCIONE EL [ID] DE LA EMPRESA DE LA CUAL SE ADMINISTRARAN SUS CUENTAS");
+                        idEmpresa = entrada.nextInt();
+                        List<Cuenta> lstCuentas = CuentaControlador.Instancia().GetListaCuentasPorEmpresa(idEmpresa);
+                        boolean opValidaCuentas = true;
+                        int opGestionCuentas;
+                        do {
+                            opGestionCuentas = 0;
+                            MostrarMenuCuentas();
+                            // Valida que la entrada sea limpia (un entero)
+                            if (!entrada.hasNextInt()) {
+                                MostrarOpcionNoValida(); // Indica el mensaje de error
+                            } else {
+                                opGestionCuentas = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
+                                int idCuenta; // Almacena el id de la cuenta que se desee eliminar o actualizar
+                                switch (opGestionCuentas) {
+                                    case 1: // Caso de agregar cuenta 
+                                        nuevaCuenta = NuevaCuenta();
+                                        nuevaCuenta.setIdEmpresaFk(EmpresaControlador.Instancia().GetEmpresaPorId(idEmpresa));
+                                        CuentaControlador.Instancia().CrearCuenta(nuevaCuenta);
+                                        System.out.println("EMPRESA CREADA EXITOSAMENTE");
+                                        break;
+                                    case 2: // Caso de actualizar datos de una cuenta
+                                        System.out.println("LISTA DE CUENTAS: ");
+                                        for (Cuenta _cuenta : lstCuentas) {
+                                            MostrarInfoCuenta(_cuenta);
+                                        }
+                                        System.out.println("INGRESE EL [ID] DE LA CUENTA QUE DESEA ACTUALIZAR");
+                                        idCuenta = entrada.nextInt();
+                                        Cuenta cuentaEditada = CuentaControlador.Instancia().GetCuentaPorId(idCuenta);
+                                        cuentaEditada = PedirInformacionDeCuenta(cuentaEditada);
+                                        CuentaControlador.Instancia().ActualizarCuenta(cuentaEditada);
+                                        System.out.println("CUENTA ACTUALIZADA EXITOSAMENTE");
+                                        break;
+                                    case 3: // Eliminar una cuenta
+                                        System.out.println("LISTA DE CUENTAS: ");
+                                        for (Cuenta _cuenta : lstCuentas) {
+                                            MostrarInfoCuenta(_cuenta);
+                                        }
+                                        System.out.println("INGRESE EL [ID] DE LA CUENTA QUE DESEA ELIMINAR");
+                                        idCuenta = entrada.nextInt();
+                                        CuentaControlador.Instancia().EliminarCuenta(idCuenta);
+                                        System.out.println("CUENTA ELIMINADA EXITOSAMENTE");
+                                        break;
+                                    case 4: // Ver lista de cuentas
+                                        System.out.println("LISTA DE CUENTAS: ");
+                                        for (Cuenta _cuenta : lstCuentas) {
+                                            MostrarInfoCuenta(_cuenta);
+                                        }
+                                        break;
+                                    case 5: // Regresar al menu principal
+                                        opValidaCuentas = false;
+                                        break;
+                                    default: // Caso no permitido
+                                        MostrarOpcionNoValida();
+                                        break;
+                                }
+                            }
+                        } while (opValidaCuentas);
                         break;
                     case 4: // Caso de administración contable
                         break;
@@ -421,7 +492,7 @@ public class ContamasterDemo {
         System.out.println("* |---------------------------------| *");
         System.out.println("* | 3 => ELIMINAR UNA EMPRESA       | *");
         System.out.println("* |---------------------------------| *");
-        System.out.println("* | 4 => VER TODOS LAS EMPRESAS     | *");
+        System.out.println("* | 4 => VER TODAS LAS EMPRESAS     | *");
         System.out.println("* |---------------------------------| *");
         System.out.println("* | 5 => REGRESAR AL MENU PRINCIPAL | *");
         System.out.println("* |---------------------------------| *");
@@ -450,6 +521,56 @@ public class ContamasterDemo {
         System.out.println("Nombre de la empresa: " + empresa.getNombre());
         System.out.println("Direccion: " + empresa.getDireccion());
         System.out.println("Email: " + empresa.getEmail());
+        System.out.println("--------------------------------------------------------");
+    }
+    
+    private static void MostrarMenuCuentas() {
+        System.out.println("************************** *************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |   MENU DE GESTION DE CUENTAS    | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |     [SELECCIONA UNA OPCION]     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 1 => AGREGAR NUEVA CUENTA       | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 2 => ACTUALIZAR UNA CUENTA      | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 3 => ELIMINAR UNA CUENTA        | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 4 => VER TODAS LAS CUENTAS      | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 5 => REGRESAR AL MENU PRINCIPAL | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");
+    }
+    
+    private static Cuenta NuevaCuenta() {
+        return PedirInformacionDeCuenta(new Cuenta());
+    }
+    
+    private static Cuenta PedirInformacionDeCuenta(Cuenta _nuevaCuenta) {
+        System.out.println("[TODOS LOS CAMPOS QUE TENGAN UN '*' SON OBLIGATORIOS]");
+        entrada.nextLine();
+        System.out.println("Codigo de la cuenta: ");
+        _nuevaCuenta.setCodigo(entrada.nextLine());
+        System.out.println("Nombre de la cuenta");
+        _nuevaCuenta.setNombre(entrada.nextLine());
+        System.out.println("Tipo de cuenta [Activo/Pasivo/Capital/Ingresos/Gastos/Retiros]");
+        _nuevaCuenta.setTipo(entrada.nextLine());
+        System.out.println("Saldo de la cuenta: ");
+        _nuevaCuenta.setSaldo(entrada.nextBigDecimal());
+        return _nuevaCuenta;
+    }
+    
+    private static void MostrarInfoCuenta(Cuenta cuenta) {
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Id: " + cuenta.getId());
+        System.out.println("Codigo: " + cuenta.getCodigo());
+        System.out.println("Nombre: " + cuenta.getNombre());
+        System.out.println("Tipo: " + cuenta.getTipo());
+        System.out.println("Saldo: " + cuenta.getSaldo());
         System.out.println("--------------------------------------------------------");
     }
 }
