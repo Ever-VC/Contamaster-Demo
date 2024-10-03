@@ -44,7 +44,7 @@ public class EmpresaControlador {
         return empresaBuscada;
     }
     
-    public List<Empresa> GetListaUsuarios() {
+    public List<Empresa> GetListaEmpresas() {
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
         return _entityManager.createQuery("SELECT empresas FROM Empresa empresas").getResultList();
@@ -54,5 +54,19 @@ public class EmpresaControlador {
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
         Empresa empresaAActualizar = _entityManager.find(Empresa.class, empresaActualizada.getId());
+        empresaAActualizar.setNombre(empresaActualizada.getNombre());
+        empresaAActualizar.setDireccion(empresaActualizada.getDireccion());
+        empresaAActualizar.setEmail(empresaActualizada.getEmail());
+        _entityManager.getTransaction().commit();
+        _entityManager.close();
+    }
+    
+    public void EliminarEmpresa(Integer id) {
+        _entityManager = setEntityManager();
+        _entityManager.getTransaction().begin();
+        Empresa empresaEliminar = _entityManager.find(Empresa.class, id);
+        _entityManager.remove(_entityManager.merge(empresaEliminar));
+        _entityManager.getTransaction().commit();
+        _entityManager.close();
     }
 }
