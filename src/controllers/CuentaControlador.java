@@ -5,10 +5,11 @@
 package controllers;
 
 import connection.Conexion;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import models.Cuenta;
+import models.Empresa;
 
 /**
  *
@@ -48,8 +49,42 @@ public class CuentaControlador {
     public List<Cuenta> GetListaCuentas() {
         _entityManager = setEntityManager();
         _entityManager.getTransaction().begin();
-        return _entityManager.createQuery("SELECT cuentas FROM Cuenta cuentas").getResultList();
+        return _entityManager.createQuery("SELECT c FROM Cuenta c").getResultList();
     }
+    
+    public List<Cuenta> GetListaCuentasPorEmpresa(Integer idEmpresa) {
+        _entityManager = setEntityManager();  // Inicializa el EntityManager
+        String jpql = "SELECT c FROM Cuenta c WHERE c.idEmpresaFk = :empresa";
+
+        List<Cuenta> cuentas = new ArrayList<>();
+        try {
+            _entityManager.getTransaction().begin();  // Inicia la transacción
+
+            // Busca la empresa por el ID
+            Empresa empresa = _entityManager.find(Empresa.class, idEmpresa);
+
+            if (empresa != null) {
+                cuentas = _entityManager.createQuery(jpql, Cuenta.class)
+                            .setParameter("empresa", empresa)  // Usa la entidad Empresa en lugar de Integer
+                            .getResultList();  // Ejecuta la consulta y obtiene el resultado
+            }
+
+            _entityManager.getTransaction().commit();  // Hace commit de la transacción
+        } catch (Exception ex) {
+            if (_entityManager.getTransaction().isActive()) {
+                _entityManager.getTransaction().rollback();  // Hace rollback en caso de error
+            }
+            ex.printStackTrace();  // Imprime el error para depuración
+        } finally {
+            if (_entityManager != null) {
+                _entityManager.close();  // Cierra el EntityManager
+            }
+        }
+
+        return cuentas;
+    }
+
+
     
     public void ActualizarCuenta(Cuenta cuentaActualizada) {
         _entityManager = setEntityManager();
