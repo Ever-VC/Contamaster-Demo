@@ -10,12 +10,16 @@ import controllers.RolControlador;
 import controllers.UsuarioControlador;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import models.Asiento;
 import models.Cuenta;
+import models.DetalleAsiento;
 import models.Empresa;
 import models.FabUsuario;
+import models.Movimiento;
 import models.Rol;
 import models.Usuario;
 
@@ -54,6 +58,9 @@ public class ContamasterDemo {
             if (!entrada.hasNextInt()) { // Valida que el dato ingresado sea un numero
                 MostrarOpcionNoValida(); // Indica el mensaje de error
             } else {
+                List<Empresa> lstEmpresas;
+                int idEmpresa;
+                List<Cuenta> lstCuentas;
                 opcion = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
                 // Se ejecuta la opción seleccionada
                 switch (opcion) {
@@ -153,8 +160,7 @@ public class ContamasterDemo {
                                 MostrarOpcionNoValida(); // Indica el mensaje de error
                             } else {
                                 opGestionEmpresas = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
-                                List<Empresa> lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
-                                int idEmpresa; // Almacena el id de la empresa que se desee eliminar o actualizar
+                                lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
                                 switch (opGestionEmpresas) {
                                     case 1: // Caso de agregar Empresa 
                                         nuevaEmpresa = NuevaEmpresa();
@@ -206,19 +212,18 @@ public class ContamasterDemo {
                         } while (opValidaEmpresas);
                         break;
                     case 3: // Caso de gestión de cuentas
-                        List<Empresa> lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
+                        lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
                         if (lstEmpresas.size() < 1) {
                             System.out.println("NO HAY NINGUNA EMPRESA REGISTRADA EN LA BASE DE DATOS");
                             break;
                         }
-                        int idEmpresa;
                         System.out.println("LISTA DE EMPRESAS: ");
                         for (Empresa _empresa : lstEmpresas) {
                             MostrarInfoEmpresa(_empresa);
                         }
                         System.out.println("SELECCIONE EL [ID] DE LA EMPRESA DE LA CUAL SE ADMINISTRARAN SUS CUENTAS");
                         idEmpresa = entrada.nextInt();
-                        List<Cuenta> lstCuentas = CuentaControlador.Instancia().GetListaCuentasPorEmpresa(idEmpresa);
+                        lstCuentas = CuentaControlador.Instancia().GetListaCuentasPorEmpresa(idEmpresa);
                         boolean opValidaCuentas = true;
                         int opGestionCuentas;
                         do {
@@ -276,6 +281,57 @@ public class ContamasterDemo {
                         } while (opValidaCuentas);
                         break;
                     case 4: // Caso de administración contable
+                        lstEmpresas = EmpresaControlador.Instancia().GetListaEmpresas();
+                        if (lstEmpresas.size() < 1) {
+                            System.out.println("NO HAY NINGUNA EMPRESA REGISTRADA EN LA BASE DE DATOS");
+                            break;
+                        }
+                        System.out.println("LISTA DE EMPRESAS: ");
+                        for (Empresa _empresa : lstEmpresas) {
+                            MostrarInfoEmpresa(_empresa);
+                        }
+                        System.out.println("SELECCIONE EL [ID] DE LA EMPRESA DE LA CUAL SE ADMINISTRARAN SUS CUENTAS");
+                        idEmpresa = entrada.nextInt();
+                        lstCuentas = CuentaControlador.Instancia().GetListaCuentasPorEmpresa(idEmpresa);
+                        boolean opValidaAsientos = true;
+                        int opAsientos;
+                        do {
+                            opAsientos = 0;
+                            MostrarMenuAdminContable();
+                            // Valida que la entrada sea limpia (un entero)
+                            if (!entrada.hasNextInt()) {
+                                MostrarOpcionNoValida(); // Indica el mensaje de error
+                            } else {
+                                opAsientos = entrada.nextInt(); // Si todo va bien (ha ingresado corrrectamente un número), almacena el dato
+                                switch (opAsientos) {
+                                    case 1: // Caso de agregar asiento 
+                                        Object[] objeto = CrearAsiento(lstCuentas);
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 2: // Caso de actualizar asiento
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 3: // Eliminar una asiento
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 4: // Ver lista de cuentas
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 5: // ver libro diario
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 6: // Crear libro mayor
+                                        System.out.println("[...MODULO EN DESARROLO...]");
+                                        break;
+                                    case 7: // Regresar al menu principal
+                                        opValidaAsientos = false;
+                                        break;
+                                    default: // Caso no permitido
+                                        MostrarOpcionNoValida();
+                                        break;
+                                }
+                            }
+                        } while (opValidaAsientos);
                         break;
                     case 5: // Cerrar sesión
                         System.out.println("GRACIAS POR PREFERIRNOS, HASTA LUEGO :)");
@@ -572,5 +628,134 @@ public class ContamasterDemo {
         System.out.println("Tipo: " + cuenta.getTipo());
         System.out.println("Saldo: " + cuenta.getSaldo());
         System.out.println("--------------------------------------------------------");
+    }
+    
+    private static void MostrarMenuAdminContable() {
+        System.out.println("************************** *************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |    MENU DE GESTION CONTABLE     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* |     [SELECCIONA UNA OPCION]     | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 1 => AGREGAR NUEVO ASIENTO      | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 2 => ACTUALIZAR UN ASIENTO      | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 3 => ELIMINAR UN ASIENTO        | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 4 => VER LIBRO DIARIO           | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 5 => MAYORISAR CUENTAS          | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 6 => BALANZA DE COMPROBACION    | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("* | 7 => REGRESAR AL MENU PRINCIPAL | *");
+        System.out.println("* |---------------------------------| *");
+        System.out.println("***************************************"); 
+    }
+    
+    private static Object[] CrearAsiento(List<Cuenta> lstCuentas) throws ParseException {
+        List<Movimiento> lstMovimientos = new ArrayList();
+        return PedirInformacionDeAsiento(new Object[]{new Asiento(), lstMovimientos, new DetalleAsiento(), lstCuentas});
+    }
+    
+    private static Object[] PedirInformacionDeAsiento(Object[] obj) throws ParseException {
+        double total_debe = 0.00;
+        double total_haber = 0.00;
+        Asiento asiento = (Asiento) obj[0];
+        List<Movimiento> lstMovimientos = (List<Movimiento>) obj[1];
+        DetalleAsiento detalleAsiento = (DetalleAsiento) obj[2];
+        List<Cuenta> lstCuentas = (List<Cuenta>) obj[3];
+        boolean nuevoMovimiento = true;
+        System.out.println("IMPORTANTE: TODOS LOS CAMPOS SON OBLIGATORIOS");
+        entrada.nextLine();
+        System.out.println("Ingrese la fecha para los movimientos, con el siguienteel formato a usar es el siguiente: [31/12/1999]: ");
+        String fecha = entrada.nextLine();
+        Date fechaNacimiento = new Date();
+        if (!"".equals(fecha)) {
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            fechaNacimiento = formato.parse(fecha);
+        }
+        
+        
+        do {
+            Movimiento _nuevoMovimiento = PedirInfoMovimiento(lstCuentas);
+            _nuevoMovimiento.setFecha(fechaNacimiento);
+            total_debe += _nuevoMovimiento.getDebe().doubleValue();
+            total_haber += _nuevoMovimiento.getHaber().doubleValue();
+            lstMovimientos.add(_nuevoMovimiento);
+            System.out.println("DETALLE DE ASIENTO");
+            System.out.println("|-------------------------------------------------------------------------|");
+            System.out.println("| FECHA\t\t |         DESCRIPCION\t\t | DEBE\t | HABER\t |");
+            System.out.println("|-------------------------------------------------------------------------|");
+            for (Movimiento _movto : lstMovimientos) {
+                MostrarDetalleMovimiento(_movto);
+            }
+            
+            System.out.println("-----------------------------------------");
+            System.out.println("Desea agregar otro movimiento? [Si/No]");
+            System.out.println("-----------------------------------------");
+            String respuesta = entrada.nextLine();
+            if (respuesta.equals("No")) {
+                if (total_debe == total_haber) {
+                    nuevoMovimiento = false;
+                } else {
+                    System.out.println("IMPOSIBLE SALIR, NO SE CUMPLE LA IGUALDAD EN EL DEBE Y EL HABER");
+                    entrada.nextLine();
+                }
+                
+            }
+        } while (nuevoMovimiento);
+        
+        return null;
+    }
+    
+    private static Movimiento PedirInfoMovimiento(List<Cuenta> lstCuentas) {
+        Movimiento _nuevoMovimiento = new Movimiento();
+        System.out.println("Ingrese la descipción del movimiento: ");
+        _nuevoMovimiento.setDescripcion(entrada.nextLine());
+        System.out.println("Ingrese el valor para el debe: ");
+        _nuevoMovimiento.setDebe(entrada.nextBigDecimal());
+        System.out.println("Ingrese el valor para el haber: ");
+        _nuevoMovimiento.setHaber(entrada.nextBigDecimal());
+        System.out.println("LISTA DE CUENTAS: ");
+        for (Cuenta _cuenta : lstCuentas) {
+            System.out.println("ID [" + _cuenta.getId() + "], Nombre: " + _cuenta.getNombre());
+        }
+        System.out.println("INGRESE EL [ID] DE LA CUENTA A LA QUE PERTENECE EL MOVIMIENTO: ");
+        int idCuenta = entrada.nextInt();
+        Cuenta cuentaModificada = CuentaControlador.Instancia().GetCuentaPorId(idCuenta);
+        _nuevoMovimiento.setIdCuentaFk(cuentaModificada);
+        String tipoCuenta = cuentaModificada.getTipo();
+        // ESTO DEBERIA HACERSE EN LA MAYORIZACION
+        switch (tipoCuenta) {
+            case "Activo": // Aumenta en el debe y disminuye en el haber
+                break;
+            case "Pasivo": // Disminuye en el debe y aumenta en el haber
+                break;
+            case "Capital": // Disminuye en el debe y aumenta en el haber
+                break;
+            case "Ingresos": // Disminuye en el debe y aumenta en el haber
+                break;
+            case "Gastos": // Aumenta en el debe y disminuye en el haber
+                break;
+            case "Retiros": // Aumenta en el debe y disminuye en el haber
+                break;
+        }
+        return _nuevoMovimiento;
+    }
+    
+    private static void MostrarDetalleMovimiento(Movimiento _movimiento) {
+        
+        Date fecha = _movimiento.getFecha();
+        SimpleDateFormat formatoCorto = new SimpleDateFormat("dd/MM/yyyy");
+        String fechaFormateada = formatoCorto.format(fecha);
+        
+        System.out.println("| " + fechaFormateada + "\t | " + _movimiento.getDescripcion() + "\t | " + _movimiento.getDebe() + "\t | " + _movimiento.getHaber() + "\t |");
+        System.out.println("|--------------------------------------------------------------------------|");
+        entrada.nextLine();
+
     }
 }
