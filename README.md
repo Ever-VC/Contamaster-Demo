@@ -1,6 +1,6 @@
 ## Crear y configurar el proyecto
 
-### Para ver el video explicativo de descarga y configuración del proyecto [preciona aquí.](https://www.google.com/ "Descarga y configuración del proyecto")
+### Para ver el video explicativo de descarga y configuración del proyecto preciona  [aquí.](https://youtu.be/DZ6Isa021xY?si=L_sqRBqbSnbRrQ2d "Descarga y configuración del proyecto")
 
 ### Para descargar el PostgreSQL JDBC Driver preciona [aquí.](https://jdbc.postgresql.org/download/postgresql-42.7.4.jar "PostgreSQL JDBC Driver")
 
